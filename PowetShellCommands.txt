@@ -1,0 +1,9 @@
+-Documentação:
+https://docs.microsoft.com/pt-br/powershell/module/microsoft.powershell.utility/invoke-webrequest?view=powershell-7.2
+
+-Acessar uma URI através usando um método específico:
+Invoke-WebRequest -Method POST -Uri http://localhost:8080/snippet/create
+
+-Se no acesso ocorrer um erro:
+*Se tiver na versão 7 adicionar -SkipHttpErrorCheck
+*Em versões antigas, após a linha do erro $Error[0].Exception.Response  
