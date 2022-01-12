@@ -1,8 +1,9 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func home(writer http.ResponseWriter, request *http.Request) {
@@ -27,18 +28,10 @@ func createSnippet(writer http.ResponseWriter, request *http.Request) {
 }
 
 func showSnippet(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Display a specifi snippet ..."))
-}
-
-func main() {
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet", showSnippet)
-	mux.HandleFunc("/snippet/create", createSnippet)
-
-	log.Printf("%s", "Starting Server on :8080")
-
-	err := http.ListenAndServe(":8080", mux)
-	log.Fatal(err)
+	id, err := strconv.Atoi(request.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(writer, request)
+		return
+	}
+	fmt.Fprintf(writer, "Exibindo Snippet de ID: %d", id)
 }
