@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"html/template"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -9,11 +11,29 @@ import (
 func home(writer http.ResponseWriter, request *http.Request) {
 	if request.URL.Path != "/" {
 		http.NotFound(writer, request)
-
 		return
 	}
 
-	writer.Write(([]byte("Hello from Snippetbox ...")))
+	files := []string{
+		".\\ui\\html\\home.page.tmpl.html",
+		".\\ui\\html\\base.layout.tmpl.html",
+		".\\ui\\html\\footer.partial.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(writer, "Internal Server Error", 500)
+		return
+	}
+
+	err = ts.Execute(writer, nil)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(writer, "Internal Server Error", 500)
+	}
+
+	return
 }
 
 func createSnippet(writer http.ResponseWriter, request *http.Request) {
