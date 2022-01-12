@@ -12,6 +12,10 @@ func main() {
 	mux.HandleFunc("/snippet", showSnippet)
 	mux.HandleFunc("/snippet/create", createSnippet)
 
+	fileServer := http.FileServer(http.Dir(".\\ui\\static\\"))
+
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+
 	log.Printf("%s", "Starting Server on :8080")
 
 	err := http.ListenAndServe(":8080", mux)
