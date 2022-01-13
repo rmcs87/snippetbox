@@ -1,23 +1,34 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 )
 
+type Config struct {
+	Addr      string
+	StaticDir string
+}
+
 func main() {
+	cfg := new(Config)
+	flag.StringVar(&cfg.Addr, "addr", ":8080", "HTTP network address")
+	flag.StringVar(&cfg.StaticDir, "static-dir", ".\\ui\\static\\", "Path to static Files")
+	flag.Parse()
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/", home)
 	mux.HandleFunc("/snippet", showSnippet)
 	mux.HandleFunc("/snippet/create", createSnippet)
 
-	fileServer := http.FileServer(http.Dir(".\\ui\\static\\"))
+	fileServer := http.FileServer(http.Dir(cfg.StaticDir))
 
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	log.Printf("%s", "Starting Server on :8080")
+	log.Printf("Starting server on %s", cfg.Addr)
 
-	err := http.ListenAndServe(":8080", mux)
+	err := http.ListenAndServe(cfg.Addr, mux)
 	log.Fatal(err)
 }
