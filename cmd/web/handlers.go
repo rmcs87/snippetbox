@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 
@@ -15,7 +14,16 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		return
 	}
 
-	files := []string{
+	s, err := app.snippets.Latest()
+	if err != nil {
+		app.serverError(writer, err)
+	}
+
+	for _, snippet := range s {
+		fmt.Fprintf(writer, "%v\n", snippet)
+	}
+
+	/*files := []string{
 		".\\ui\\html\\home.page.tmpl.html",
 		".\\ui\\html\\base.layout.tmpl.html",
 		".\\ui\\html\\footer.partial.tmpl.html",
@@ -32,7 +40,7 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		app.serverError(writer, err)
 	}
 
-	return
+	return*/
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
