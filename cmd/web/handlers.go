@@ -5,6 +5,8 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+
+	"github.com/rmcs87/snippetbox/pkg/models"
 )
 
 func (app *application) home(writer http.ResponseWriter, request *http.Request) {
@@ -60,5 +62,15 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 		app.notFound(writer)
 		return
 	}
-	fmt.Fprintf(writer, "Exibindo Snippet de ID: %d", id)
+
+	s, err := app.snippets.Get(id)
+	if err == models.ErrNoRecord {
+		app.notFound(writer)
+		return
+	} else if err != nil {
+		app.serverError(writer, err)
+		return
+	}
+
+	fmt.Fprintf(writer, "%v", s)
 }
