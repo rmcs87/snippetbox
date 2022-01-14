@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/rmcs87/snippetbox/pkg/models/mysql"
+
 	_ "github.com/go-sql-driver/mysql" // New import
 )
 
@@ -19,7 +21,7 @@ type application struct {
 	errorLog *log.Logger
 	infoLog  *log.Logger
 	cfg      *Config
-	db       *sql.DB
+	snippets *mysql.SnippetModel
 }
 
 func main() {
@@ -46,6 +48,7 @@ func main() {
 		errorLog: errorLog,
 		infoLog:  infoLog,
 		cfg:      cfg,
+		snippets: &mysql.SnippetModel{DB: db},
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.Addr)
