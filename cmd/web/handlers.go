@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
@@ -80,5 +81,23 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	fmt.Fprintf(writer, "%v", s)
+	data := &tempalteData{Snippet: s}
+
+	files := []string{
+		".\\ui\\html\\show.page.tmpl.html",
+		".\\ui\\html\\base.layout.tmpl.html",
+		".\\ui\\html\\footer.partial.tmpl.html",
+	}
+
+	ts, err := template.ParseFiles(files...)
+	if err != nil {
+		app.serverError(writer, err)
+		return
+	}
+
+	err = ts.Execute(writer, data)
+
+	if err != nil {
+		app.serverError(writer, err)
+	}
 }
