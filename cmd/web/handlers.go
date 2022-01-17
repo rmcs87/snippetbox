@@ -20,11 +20,9 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		app.serverError(writer, err)
 	}
 
-	for _, snippet := range s {
-		fmt.Fprintf(writer, "%v\n", snippet)
-	}
+	data := &templateData{Snippets: s}
 
-	/*files := []string{
+	files := []string{
 		".\\ui\\html\\home.page.tmpl.html",
 		".\\ui\\html\\base.layout.tmpl.html",
 		".\\ui\\html\\footer.partial.tmpl.html",
@@ -36,12 +34,10 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 		return
 	}
 
-	err = ts.Execute(writer, nil)
+	err = ts.Execute(writer, data)
 	if err != nil {
 		app.serverError(writer, err)
 	}
-
-	return*/
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
@@ -81,7 +77,7 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 		return
 	}
 
-	data := &tempalteData{Snippet: s}
+	data := &templateData{Snippet: s}
 
 	files := []string{
 		".\\ui\\html\\show.page.tmpl.html",
