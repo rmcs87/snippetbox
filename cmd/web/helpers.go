@@ -19,3 +19,14 @@ func (app *application) clientError(writer http.ResponseWriter, status int) {
 func (app *application) notFound(writer http.ResponseWriter) {
 	app.clientError(writer, http.StatusNotFound)
 }
+
+func (app *application) render(writer http.ResponseWriter, request *http.Request, name string, td *templateData) {
+	ts, ok := app.templateCache[name]
+	if !ok {
+		app.serverError(writer, fmt.Errorf("Teh tamplate %s does note exist", name))
+	}
+	err := ts.Execute(writer, td)
+	if err != nil {
+		app.serverError(writer, err)
+	}
+}
