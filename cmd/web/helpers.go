@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 	"runtime/debug"
@@ -25,8 +26,14 @@ func (app *application) render(writer http.ResponseWriter, request *http.Request
 	if !ok {
 		app.serverError(writer, fmt.Errorf("Teh tamplate %s does note exist", name))
 	}
-	err := ts.Execute(writer, td)
+
+	buf := new(bytes.Buffer)
+
+	err := ts.Execute(buf, td)
 	if err != nil {
 		app.serverError(writer, err)
+		return
 	}
+
+	buf.WriteTo(writer)
 }
