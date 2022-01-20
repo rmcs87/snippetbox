@@ -9,11 +9,6 @@ import (
 )
 
 func (app *application) home(writer http.ResponseWriter, request *http.Request) {
-	if request.URL.Path != "/" {
-		app.notFound(writer)
-		return
-	}
-
 	s, err := app.snippets.Latest()
 	if err != nil {
 		app.serverError(writer, err)
@@ -24,14 +19,11 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 	})
 }
 
+func (app *application) createSnippetForm(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("Create a new snippet..."))
+}
+
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
-	if request.Method != "POST" {
-		writer.Header().Set("Allow", "POST")
-		app.clientError(writer, http.StatusMethodNotAllowed)
-
-		return
-	}
-
 	title := "0 snail"
 	content := "A arte de amar."
 	expires := "7"
@@ -42,11 +34,11 @@ func (app *application) createSnippet(writer http.ResponseWriter, request *http.
 		return
 	}
 
-	http.Redirect(writer, request, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
+	http.Redirect(writer, request, fmt.Sprintf("/snippet/%d", id), http.StatusSeeOther)
 }
 
 func (app *application) showSnippet(writer http.ResponseWriter, request *http.Request) {
-	id, err := strconv.Atoi(request.URL.Query().Get("id"))
+	id, err := strconv.Atoi(request.URL.Query().Get(":id"))
 	if err != nil || id < 1 {
 		app.notFound(writer)
 		return
