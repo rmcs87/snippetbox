@@ -20,7 +20,7 @@ func (app *application) home(writer http.ResponseWriter, request *http.Request) 
 }
 
 func (app *application) createSnippetForm(writer http.ResponseWriter, request *http.Request) {
-	writer.Write([]byte("Create a new snippet..."))
+	app.render(writer, request, "create.page.tmpl.html", nil)
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
