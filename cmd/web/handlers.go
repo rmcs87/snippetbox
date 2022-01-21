@@ -24,9 +24,15 @@ func (app *application) createSnippetForm(writer http.ResponseWriter, request *h
 }
 
 func (app *application) createSnippet(writer http.ResponseWriter, request *http.Request) {
-	title := "0 snail"
-	content := "A arte de amar."
-	expires := "7"
+	err := request.ParseForm()
+	if err != nil {
+		app.clientError(writer, http.StatusBadRequest)
+		return
+	}
+
+	title := request.PostForm.Get("title")
+	content := request.PostForm.Get("content")
+	expires := request.PostForm.Get("expires")
 
 	id, err := app.snippets.Insert(title, content, expires)
 	if err != nil {
