@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/golangcollege/sessions"
 	"github.com/rmcs87/snippetbox/pkg/models/mysql"
 
 	_ "github.com/go-sql-driver/mysql" // New import
@@ -24,6 +26,7 @@ type application struct {
 	cfg           *Config
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
+	session       *sessions.Session
 }
 
 func main() {
@@ -32,6 +35,7 @@ func main() {
 	flag.StringVar(&cfg.StaticDir, "static-dir", ".\\ui\\static\\", "Path to static Files")
 
 	dsn := flag.String("dsn", "root:123456@/snippetbox?parseTime=true", "Mysql Connection String")
+	secret := flag.String("secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Cryp Secret")
 
 	flag.Parse()
 
@@ -50,12 +54,16 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	session := sessions.New([]byte(*secret))
+	session.Lifetime = 16 * time.Hour
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		cfg:           cfg,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
+		session:       session,
 	}
 
 	infoLog.Printf("Starting server on %s", cfg.Addr)
