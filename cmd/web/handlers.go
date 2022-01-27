@@ -77,11 +77,41 @@ func (app *application) showSnippet(writer http.ResponseWriter, request *http.Re
 }
 
 func (app *application) signupUserForm(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "Display the user form")
+	app.render(writer, request, "signup.page.tmpl.html", &templateData{
+		Form: forms.New(nil),
+	})
 }
 
 func (app *application) signupUser(writer http.ResponseWriter, request *http.Request) {
-	fmt.Fprintln(writer, "Create a New User")
+	err := request.ParseForm()
+	if err != nil {
+		app.clientError(writer, http.StatusBadRequest)
+		return
+	}
+
+	form := forms.New(request.PostForm)
+	form.Required("name", "email", "password")
+	form.MatchesPattern("email", forms.EmailRX)
+	form.MinLength("password", 10)
+
+	if !form.Valid() {
+		app.render(writer, request, "signup.page.tmpl.html", &templateData{Form: form})
+		return
+	}
+
+	err = app.users.Insert(form.Get("name"), form.Get("email"), form.Get("password"))
+	if err == models.ErrDuplicateEmail {
+		form.Errors.Add("email", "Address is already in use")
+		app.render(writer, request, "signup.page.tmpl.html", &templateData{Form: form})
+		return
+	} else if err != nil {
+		app.serverError(writer, err)
+		return
+	}
+
+	app.session.Put(request, "flash", "Your signup was successful. Please log in")
+
+	http.Redirect(writer, request, "/user/login", http.StatusSeeOther)
 }
 
 func (app *application) loginUserForm(writer http.ResponseWriter, request *http.Request) {
