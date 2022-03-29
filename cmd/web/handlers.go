@@ -9,6 +9,10 @@ import (
 	"github.com/rmcs87/snippetbox/pkg/models"
 )
 
+func ping(writer http.ResponseWriter, request *http.Request) {
+	writer.Write([]byte("OK"))
+}
+
 func (app *application) home(writer http.ResponseWriter, request *http.Request) {
 	s, err := app.snippets.Latest()
 	if err != nil {
