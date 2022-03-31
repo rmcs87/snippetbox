@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/golangcollege/sessions"
+	"github.com/rmcs87/snippetbox/pkg/models"
 	"github.com/rmcs87/snippetbox/pkg/models/mysql"
 
 	_ "github.com/go-sql-driver/mysql" // New import
@@ -22,13 +23,21 @@ type Config struct {
 }
 
 type application struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	cfg           *Config
-	snippets      *mysql.SnippetModel
+	errorLog *log.Logger
+	infoLog  *log.Logger
+	cfg      *Config
+	snippets interface {
+		Insert(string, string, string) (int, error)
+		Get(int) (*models.Snippet, error)
+		Latest() ([]*models.Snippet, error)
+	}
 	templateCache map[string]*template.Template
 	session       *sessions.Session
-	users         *mysql.UserModel
+	users         interface {
+		Insert(string, string, string) error
+		Authenticate(string, string) (int, error)
+		Get(int) (*models.User, error)
+	}
 }
 
 func main() {
